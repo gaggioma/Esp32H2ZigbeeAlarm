@@ -42,7 +42,8 @@ Following a brief description of GPIO that has bee used.
 * 3.3V: used to battery power supply. The voltage must be regulated in [3.0, 3.6]V so i've used a [TZT voltage regulator](https://it.aliexpress.com/item/1005004680099594.html?spm=a2g0o.order_list.order_list_main.22.9ff936963w80yh&gatewayAdapt=glo2ita);
 * GND: common ground. All grounds must be in common.
 
-ESP32H2 supermini board uses ESP32H2 chip so the datasheet will be [here](https://documentation.espressif.com/esp32-h2_datasheet_en.pdf).
+ESP32H2 supermini board uses ESP32H2 chip so the [datasheet will be here](https://documentation.espressif.com/esp32-h2_datasheet_en.pdf).
+An overview on [GPIO here](https://docs.espressif.com/projects/esp-idf/en/stable/esp32h2/api-reference/peripherals/gpio.html).
 
 An important thing:
 * avoid to use GPIO relative to strapping pins, this can create conflicts with important pin functions;
