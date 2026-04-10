@@ -25,11 +25,19 @@ In picture above there are all connections between ESP32H2, alarm and power supp
   <img src="/images/power_scheme.PNG" alt="power_scheme" style="width:auto;">
 </picture>
 
-The circuit measure the voltage of battery (used to know the consumpion) by means of voltage divider.
+The voltage of battery (used to know the consumption) is carried out by means of voltage divider.
 
 This divider is reccomended because the battery voltage reach 4.2V when fully charged (too high for max of 3.3V for GPIO), so with a divider factor of 0.78 it reduce the max voltage to approximatively 3.3V.
 
+The behaviour of this circuit is the follow:
+- GPIO10 (high) => V<sub>gs</sub> N-Mosfet > 0 => V<sub>gs</sub> P-mosfet < 0 then voltage divider is active;
+- GPIO10 (high impedence) => V<sub>gs</sub> of N-Mosfet = 0 => P-mosfet V<sub>gs</sub> = 0 then voltage divider is disabled.
+
 The advantage of this circuit is that the voltage divider drain current only when the GPIO10 enable the N-Mosfet gate. This increment the efficiency of overall circuit.
+
+For this cricuit i've choosen these type of transistors:
+ - Mosfet-N [IRLZ44N](https://www.infineon.com/assets/row/public/documents/24/49/infineon-irlz44n-datasheet-en.pdf?fileId=5546d462533600a40153567217c32725);
+ - Mosfet-P [IRF9540](hhttps://www.vishay.com/docs/91078/91078.pdf)
 
 ## Esp32H2 connection description and documentations
 
