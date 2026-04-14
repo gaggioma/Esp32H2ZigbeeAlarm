@@ -60,6 +60,10 @@ uint8_t alarm_activation = 14;
 uint8_t wu_bypass = 4;
 uint8_t voltage_divider = 10;
 
+//Persistent data in RTC memory
+RTC_DATA_ATTR int batteryPercent = 0;
+RTC_DATA_ATTR int batteryVolts = 0;
+
 //ADC. https://docs.espressif.com/projects/arduino-esp32/en/latest/api/adc.html
 uint8_t adc_pin = 1; //Use GPIO01
 
@@ -220,13 +224,52 @@ void updateAlarmState(){
   zbBinaryExternal.reportBinaryInput();
 }
 
+void restoreBatteryState(){
+  //Attach stored values into report, to avoid zero percentage
+  zbBattery.setAnalogInput(batteryVolts);
+  zbBatteryPercent.setAnalogInput(batteryPercent); 
+}
+
+void setBatteryState(){
+
+  //Enable voltage divider and wait 1s to stabize value before reading
+  digitalWrite(voltage_divider, HIGH);
+
+  //Make 60 ADC measurements with delay of 1sec and make avg to get battery usage
+  int analogVoltsAvg = 0;
+  int numberOfSamples = 200;
+  int sampleDelayMs = 5;
+  for(int measCount = 0; measCount<=numberOfSamples; measCount++){
+
+    //Read from ADC
+    int analogVolts = analogReadMilliVolts(adc_pin);
+    analogVoltsAvg += analogVolts;
+    int analogValue = analogRead(adc_pin);
+    
+    delay(sampleDelayMs);
+  }
+
+  //Avg over all samples
+  analogVoltsAvg = analogVoltsAvg/numberOfSamples;
+
+  batteryVolts = getBatteryValue(analogVoltsAvg);
+  batteryPercent = getBatteryPercent(analogVoltsAvg);
+  
+  Serial.printf("Battery millivolts value = %d\n", batteryVolts);
+  Serial.printf("Battery percent = %d %\n", batteryPercent);
+
+  //Report voltage and battery value.
+  zbBattery.setAnalogInput(batteryVolts);
+  zbBatteryPercent.setAnalogInput(batteryPercent);  
+
+  //Report battey consumption
+  zbBatteryPercent.reportAnalogInput();
+  zbBattery.reportAnalogInput();
+}
+
 void setup() {
   Serial.begin(115200);
   Serial.println("Starting setup function Alarm Zigbee...");
-
-  //Increment boot number and print it every reboot
-  //++bootCount;
-  //Serial.println("Boot number: " + String(bootCount));
 
   //Print the wakeup reason for ESP32
   print_wakeup_reason();
@@ -238,7 +281,6 @@ void setup() {
 
   //Esp32H2 supermini turn off blue led
   pinMode(blue_led, OUTPUT);
-  digitalWrite(blue_led, LOW);
   
   // Init button switch
   pinMode(button, INPUT_PULLUP);
@@ -303,6 +345,10 @@ void setup() {
   Serial.println("Connecting to network");
   while (!Zigbee.connected()) {
     Serial.print(".");
+    //Switch on blue led
+    digitalWrite(blue_led, HIGH);
+    delay(100);
+    digitalWrite(blue_led, LOW);
     delay(100);
   }
   Serial.println("Connected");
@@ -329,60 +375,32 @@ void loop() {
   //If by pass is enable skip all
   if(digitalRead(wu_bypass) == LOW){
 
+    //Switch off blue led
+    digitalWrite(blue_led, LOW);
+
     //Enable voltage divider and wait 1s to stabize value before reading
     digitalWrite(voltage_divider, HIGH);
-
-    delay(1000);
 
     bool is_gpio_ext1_wu = isGPIO_ext1_WakeUp();
     bool is_time_wu = isTimerWakeUp();
 
-    //Update alarm state
-    //updateAlarmState();
+    //Restore battery state from RTC memeory
+    restoreBatteryState();
 
-    //Make 60 ADC measurements with delay of 1sec and make avg to get battery usage
-    int analogVoltsAvg = 0;
-    int numberOfSamples = 200;
-    int sampleDelayMs = 5;
-    for(int measCount = 0; measCount<=numberOfSamples; measCount++){
-
-      //Read from ADC
-      int analogVolts = analogReadMilliVolts(adc_pin);
-      analogVoltsAvg += analogVolts;
-      int analogValue = analogRead(adc_pin);
-      
-      // print out the values you read:
-      Serial.printf("ADC analog value = %d\n", analogValue);
-      Serial.printf("ADC millivolts value = %d\n", analogVolts);
-
-      delay(sampleDelayMs);
-    }
-
-    //Avg over all samples
-    analogVoltsAvg = analogVoltsAvg/numberOfSamples;
-
-    int batteryVolts = getBatteryValue(analogVoltsAvg);
-    int battery_percent = getBatteryPercent(analogVoltsAvg);
-    
-    Serial.printf("Battery millivolts value = %d\n", batteryVolts);
-    Serial.printf("Battery percent = %d %\n", battery_percent);
-
-    //Report voltage and battery value.
-    zbBattery.setAnalogInput(batteryVolts);
-    zbBatteryPercent.setAnalogInput(battery_percent);  
-
-    //Report battey consumption
-    zbBattery.reportAnalogInput(); 
-    zbBatteryPercent.reportAnalogInput();
+    //Update battery state
+    setBatteryState();
 
     //Update alarm state for variation during battery update
     updateAlarmState();
 
     //wait to report
-    delay(1000);
+    delay(500);
 
     //set wake up conditions
     setWakeUp();
+  }else{
+    //Switch on blue led
+    digitalWrite(blue_led, HIGH);
   }
 
   delay(500); 
