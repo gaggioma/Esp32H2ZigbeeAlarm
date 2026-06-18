@@ -326,7 +326,6 @@ void setup() {
   zbBatteryPercent.setAnalogInputResolution(1);
 
   // Add endpoints to Zigbee Core
-  //Zigbee.addEndpoint(&zbBinaryZone);
   Zigbee.addEndpoint(&zbBinaryInternal);
   Zigbee.addEndpoint(&zbBinaryExternal);
   Zigbee.addEndpoint(&zbBattery);
