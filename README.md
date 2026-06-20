@@ -69,9 +69,9 @@ Basically the software carry out these functionalities:
 * reduce power consumption with Deep Sleep;
 * if no alarm states change until 24 hours, a battery measurement is trasmitted. 
 
-[Arduino Zigbee APIs](https://docs.espressif.com/projects/arduino-esp32/en/latest/libraries.html#zigbee-apis).
+[Arduino Zigbee APIs](https://docs.espressif.com/projects/arduino-esp32/en/latest/libraries.html#zigbee-apis)
 
-[Arduino ESP32 generic libraries](https://docs.espressif.com/projects/arduino-esp32/en/latest/libraries.html#apis).
+[Arduino ESP32 generic libraries](https://docs.espressif.com/projects/arduino-esp32/en/latest/libraries.html#apis)
 
 [My implemetation](/alarm_esp32h2.ino)
 
