@@ -69,11 +69,11 @@ Basically the software carry out these functionalities:
 * reduce power consumption with Deep Sleep;
 * if no alarm states change until 24 hours, a battery measurement is trasmitted. 
 
-Documentation about Zigbee APIs [here](https://docs.espressif.com/projects/arduino-esp32/en/latest/libraries.html#zigbee-apis) i've found all documentation about Zigbee APIs.
+[Arduino Zigbee APIs](https://docs.espressif.com/projects/arduino-esp32/en/latest/libraries.html#zigbee-apis).
 
-Arduino ESP32 generic libraries [here](https://docs.espressif.com/projects/arduino-esp32/en/latest/libraries.html#apis).
+[Arduino ESP32 generic libraries](https://docs.espressif.com/projects/arduino-esp32/en/latest/libraries.html#apis).
 
-My implemetation is [here](/alarm_esp32h2.ino)
+[My implemetation](/alarm_esp32h2.ino)
 
 ## Fracarro Defender 24 alarm
 
